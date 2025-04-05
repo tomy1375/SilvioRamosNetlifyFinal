@@ -126,6 +126,12 @@ try {
     try {
       console.log(`Registrando descarga: plano=${planoId}, usuario=${userId}`);
       
+      // Mostrar en la consola los datos que se van a enviar
+      console.log('Datos a enviar:', {
+        plano_id: planoId,
+        usuario_id: userId
+      });
+      
       const response = await fetch('/api/registrar-descarga', {
         method: 'POST',
         headers: {
@@ -137,11 +143,21 @@ try {
         }),
       });
       
+      // Verificar si la respuesta es exitosa
+      if (!response.ok) {
+        console.error(`Error HTTP: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
       
-      if (!data.success) {
+      if (data.success) {
+        console.log('Descarga registrada exitosamente');
+      } else {
         console.error('Error al registrar descarga:', data.error);
+        if (data.details) {
+          console.error('Detalles del error:', data.details);
+        }
       }
     } catch (error) {
       console.error('Error al registrar descarga:', error);
@@ -150,13 +166,18 @@ try {
   
   // Agregar event listeners a todos los botones de descarga
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('Configurando botones de descarga...');
+    
     const downloadButtons = document.querySelectorAll('.download-btn');
+    console.log(`Se encontraron ${downloadButtons.length} botones de descarga`);
     
     downloadButtons.forEach(button => {
       button.addEventListener('click', function(e) {
         // No prevenir el comportamiento predeterminado para permitir la descarga
         const planoId = this.getAttribute('data-plano-id');
         const userId = this.getAttribute('data-usuario-id') || usuarioId;
+        
+        console.log(`Click en botón de descarga: plano=${planoId}, usuario=${userId}`);
         
         // Registrar la descarga
         registrarDescarga(planoId, userId);

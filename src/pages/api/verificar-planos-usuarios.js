@@ -1,38 +1,35 @@
-import { query } from "../../lib/db.js"
+import { getPlanos, getUsers } from "../../lib/db.js"
 
+// Actualizado para usar las funciones de Prisma en lugar de query
 export async function GET() {
   try {
     console.log("Verificando relación entre planos y usuarios...")
 
     // Obtener todos los planos con información de usuario
-    const planosResult = await query(`
-      SELECT p.id, p.nombre, p.tipo, p.fecha_subida, p.usuario_id, 
-             u.id as usuario_real_id, u.nombre as usuario_nombre, u.tipo as usuario_tipo
-      FROM planos p
-      LEFT JOIN usuarios u ON p.usuario_id = u.id
-      ORDER BY p.fecha_subida DESC, p.id DESC
-    `)
+    const planos = await getPlanos()
+    console.log(`Se encontraron ${planos.length} planos`)
 
     // Verificar si hay planos sin usuario asociado
-    const planosSinUsuario = planosResult.rows.filter((plano) => !plano.usuario_real_id)
+    const planosSinUsuario = planos.filter((plano) => !plano.usuario_id)
+    console.log(`Se encontraron ${planosSinUsuario.length} planos sin usuario asociado`)
 
-    // Obtener todos los usuarios de tipo cliente
-    const clientesResult = await query(`
-      SELECT id, nombre, email, tipo
-      FROM usuarios
-      WHERE tipo = 'cliente' OR tipo = 'Cliente'
-      ORDER BY id ASC
-    `)
+    // Obtener todos los usuarios
+    const usuarios = await getUsers()
+    console.log(`Se encontraron ${usuarios.length} usuarios`)
+
+    // Filtrar solo los clientes
+    const clientes = usuarios.filter((usuario) => usuario.tipo && usuario.tipo.toLowerCase() === "cliente")
+    console.log(`Se encontraron ${clientes.length} clientes`)
 
     return new Response(
       JSON.stringify({
         success: true,
-        totalPlanos: planosResult.rows.length,
+        totalPlanos: planos.length,
         planosSinUsuario: planosSinUsuario.length,
         detallesPlanosSinUsuario: planosSinUsuario,
-        totalClientes: clientesResult.rows.length,
-        clientes: clientesResult.rows,
-        todosLosPlanos: planosResult.rows,
+        totalClientes: clientes.length,
+        clientes: clientes,
+        todosLosPlanos: planos,
       }),
       {
         status: 200,

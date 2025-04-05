@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.0.17",
     "astro": "^5.5.5",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.485.0",
     "pg": "^8.14.1",

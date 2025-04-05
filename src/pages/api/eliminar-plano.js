@@ -1,14 +1,5 @@
-import fs from "fs"
-import path from "path"
-import { fileURLToPath } from "url"
 import { deletePlano, getPlanoById } from "../../lib/db.js"
-
-// Obtener el directorio actual
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Directorio donde se guardan los archivos
-const uploadDir = path.join(__dirname, "../../../public")
+import { deleteFile } from "../../lib/storage.js"
 
 export async function POST({ request }) {
   try {
@@ -40,19 +31,16 @@ export async function POST({ request }) {
 
     console.log("Plano encontrado:", plano)
 
-    // Eliminar el archivo físico
+    // Eliminar el archivo de Cloudinary
     try {
-      const filePath = path.join(uploadDir, plano.archivo_url)
-      console.log("Intentando eliminar archivo:", filePath)
-
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath)
-        console.log("Archivo eliminado correctamente")
+      if (plano.archivo_url && plano.archivo_url.includes("cloudinary.com")) {
+        console.log("Intentando eliminar archivo de Cloudinary:", plano.archivo_url)
+        await deleteFile(plano.archivo_url)
       } else {
-        console.log("El archivo no existe en el sistema de archivos")
+        console.log("La URL del archivo no es de Cloudinary o está vacía:", plano.archivo_url)
       }
     } catch (fileError) {
-      console.error("Error al eliminar el archivo físico:", fileError)
+      console.error("Error al eliminar el archivo de Cloudinary:", fileError)
       // Continuamos con la eliminación del registro en la base de datos
     }
 

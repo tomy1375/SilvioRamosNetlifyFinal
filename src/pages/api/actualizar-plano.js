@@ -1,5 +1,6 @@
 import { updatePlano, getPlanoById } from "../../lib/db.js"
 
+// No necesita cambios para Cloudinary ya que no modifica el archivo
 export async function POST({ request }) {
   try {
     console.log("Recibida solicitud para actualizar plano")
@@ -35,6 +36,7 @@ export async function POST({ request }) {
       nombre,
       tipo,
       descripcion: descripcion || "",
+      usuario_id: userId, // Añadido para actualizar también el usuario
     })
 
     console.log("Plano actualizado correctamente:", planoActualizado)

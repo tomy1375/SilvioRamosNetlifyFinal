@@ -1,19 +1,5 @@
-import fs from "fs"
-import path from "path"
-import { fileURLToPath } from "url"
 import { createPlano } from "../../lib/db.js"
-
-// Obtener el directorio actual
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Directorio donde se guardarán los archivos
-const uploadDir = path.join(__dirname, "../../../public/planos")
-
-// Asegurarse de que el directorio existe
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true })
-}
+import { uploadFile } from "../../lib/storage.js"
 
 export async function POST({ request }) {
   try {
@@ -42,19 +28,12 @@ export async function POST({ request }) {
       })
     }
 
-    // Generar un nombre único para el archivo
-    const timestamp = Date.now()
-    const fileName = `${timestamp}-${archivo.name.replace(/\s+/g, "-")}`
-    const filePath = path.join(uploadDir, fileName)
-
-    // Guardar el archivo en el sistema de archivos
-    const fileBuffer = await archivo.arrayBuffer()
-    fs.writeFileSync(filePath, Buffer.from(fileBuffer))
-
-    // Ruta relativa para guardar en la base de datos
-    const archivo_url = `/planos/${fileName}`
-
     try {
+      // Subir el archivo a Cloudinary
+      console.log("Subiendo archivo a Cloudinary...")
+      const archivo_url = await uploadFile(archivo)
+      console.log("Archivo subido exitosamente:", archivo_url)
+
       // Guardar la información en la base de datos
       const plano = await createPlano({
         nombre,
@@ -69,8 +48,7 @@ export async function POST({ request }) {
         headers: { "Content-Type": "application/json" },
       })
     } catch (dbError) {
-      // Si hay un error en la base de datos, eliminar el archivo subido
-      fs.unlinkSync(filePath)
+      console.error("Error al crear plano:", dbError)
 
       // Verificar si es un error de tabla no existente
       if (dbError.code === "42P01") {
