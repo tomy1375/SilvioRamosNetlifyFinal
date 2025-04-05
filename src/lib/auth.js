@@ -1,4 +1,4 @@
-import { prisma } from './prisma.js'
+import prisma  from './prisma.js'
 
 // Función para manejar el inicio de sesión
 export async function login(email, password) {
