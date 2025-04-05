@@ -8,11 +8,13 @@ export async function POST({ request }) {
     console.log("Datos recibidos:", data)
 
     const { plano_id, usuario_id } = data
+    const planoId = Number.parseInt(plano_id, 10) // Convertir a número entero
+    const userId = Number.parseInt(usuario_id, 10) // Convertir a número entero
 
     // Validar que se recibieron todos los datos necesarios
-    if (!plano_id || !usuario_id) {
-      console.error("Faltan datos requeridos")
-      return new Response(JSON.stringify({ error: "Faltan datos requeridos" }), {
+    if (!plano_id || !usuario_id || isNaN(planoId) || isNaN(userId)) {
+      console.error("Faltan datos requeridos o IDs inválidos")
+      return new Response(JSON.stringify({ error: "Faltan datos requeridos o IDs inválidos" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       })
@@ -25,8 +27,8 @@ export async function POST({ request }) {
 
     // Registrar la descarga en el historial
     const historial = await createHistorial({
-      usuario_id,
-      plano_id,
+      usuario_id: userId,
+      plano_id: planoId,
       fecha,
       hora,
     })

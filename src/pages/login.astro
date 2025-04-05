@@ -1,21 +1,7 @@
 ---
-// Importar pg correctamente como módulo CommonJS
-import pkg from 'pg';
-const { Pool } = pkg;
-
 import { login } from '../lib/auth.js';
 import Layout from '../layouts/Layout.astro';
 import TransitionLoader from '../components/TransitionLoader';
-
-// Configuración de la conexión a PostgreSQL
-const pool = new Pool({
- user: import.meta.env.DB_USER || "",
- host: import.meta.env.DB_HOST || "",
- database: import.meta.env.DB_NAME || "",
- password: String(import.meta.env.DB_PASSWORD || ""),
- port: Number.parseInt(import.meta.env.DB_PORT || "5432"),
- ssl: import.meta.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
-});
 
 // Cambiar la declaración de redirectUrl para aceptar undefined
 let error = null;
@@ -23,88 +9,95 @@ let redirectUrl: string | undefined = '';
 
 // Procesar el formulario de inicio de sesión
 if (Astro.request.method === 'POST') {
- try {
-   const formData = await Astro.request.formData();
-   const email = formData.get('email');
-   const password = formData.get('password');
-   
-   if (!email || !password) {
-     error = "Por favor, complete todos los campos";
-   } else {
-     const result = await login(email.toString(), password.toString(), pool);
-     
-     // Más abajo, donde se asigna redirectUrl, asegurarnos de que no sea undefined
-     if (result.success) {
-       // Crear cookie de sesión
-       const sessionData = JSON.stringify(result.usuario);
-       const cookieOptions = "Path=/; HttpOnly; SameSite=Strict; Max-Age=86400"; // 24 horas
+try {
+  const formData = await Astro.request.formData();
+  const email = formData.get('email');
+  const password = formData.get('password');
+  
+  if (!email || !password) {
+    error = "Por favor, complete todos los campos";
+  } else {
+    const result = await login(email.toString(), password.toString());
+    
+    // Más abajo, donde se asigna redirectUrl, asegurarnos de que no sea undefined
+    if (result.success) {
+      // Crear cookie de sesión
+      const sessionData = JSON.stringify(result.usuario);
+      const cookieOptions = "Path=/; HttpOnly; SameSite=Strict; Max-Age=86400"; // 24 horas
+      
+      // Usar un valor predeterminado si redirect es undefined
+      redirectUrl = result.redirect || '/cliente';
+      
+      // Establecer la cookie y redirigir usando JavaScript
+      return new Response(
+        `<html>
+   <head>
+     <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+     <script>
+       // Establecer el mensaje para el TransitionLoader
+       sessionStorage.setItem('navigationAction', 'login');
+       sessionStorage.setItem('navigationTarget', '${redirectUrl}');
        
-       // Usar un valor predeterminado si redirect es undefined
-       redirectUrl = result.redirect || '/cliente';
-       
-       // Establecer la cookie y redirigir usando JavaScript
-       return new Response(
-         `<html>
-    <head>
-      <meta http-equiv="refresh" content="0;url=${redirectUrl}">
-      <script>
-        // Establecer el mensaje para el TransitionLoader
-        sessionStorage.setItem('navigationAction', 'login');
-        sessionStorage.setItem('navigationTarget', '${redirectUrl}');
-        
-        // Aplicar el tema oscuro inmediatamente si es necesario
-        (function() {
-          const savedTheme = localStorage.getItem('theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          
-          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.style.colorScheme = 'dark';
-            document.documentElement.style.backgroundColor = '#1a1a1a';
-          }
-        })();
-        
-        // Mostrar el loader con mensaje específico
-        document.addEventListener('DOMContentLoaded', function() {
-          const event = new CustomEvent('showLoader', { 
-            detail: { message: 'Iniciando sesión...' } 
-          });
-          document.dispatchEvent(event);
-        });
-      </script>
-    </head>
-    <body style="visibility: hidden; background-color: #1a1a1a;">
-      <div id="loader" style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background-color: rgba(17, 24, 39, 0.9); visibility: visible;">
-        <div style="text-align: center;">
-          <div style="display: inline-block; width: 3rem; height: 3rem; border-radius: 9999px; border: 4px solid; border-color: #0284c7; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
-          <p style="margin-top: 1rem; font-size: 1.125rem; font-weight: 500; color: white;">Iniciando sesión...</p>
-        </div>
-      </div>
-      <style>
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      </style>
-    </body>
-  </html>`,
-         {
-           status: 200,
-           headers: {
-             'Content-Type': 'text/html',
-             'Set-Cookie': `session=${encodeURIComponent(sessionData)}; ${cookieOptions}`
-           }
+       // Aplicar el tema oscuro inmediatamente si es necesario
+       (function() {
+         const savedTheme = localStorage.getItem('theme');
+         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+         
+         if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+           document.documentElement.classList.add('dark');
+           document.documentElement.style.colorScheme = 'dark';
+           document.documentElement.style.backgroundColor = '#1a1a1a';
          }
-       );
-     } else {
-       error = result.error;
-     }
-   }
- } catch (err) {
-   console.error("Error en el inicio de sesión:", err);
-   error = "Error al procesar la solicitud. Por favor, inténtelo de nuevo.";
- }
+       })();
+       
+       // Mostrar el loader con mensaje específico
+       document.addEventListener('DOMContentLoaded', function() {
+         const event = new CustomEvent('showLoader', { 
+           detail: { message: 'Iniciando sesión...' } 
+         });
+         document.dispatchEvent(event);
+         
+         // Limpiar después de la redirección
+         window.addEventListener('beforeunload', function() {
+           sessionStorage.removeItem('navigationAction');
+         });
+       });
+     </script>
+   </head>
+   <body style="visibility: hidden; background-color: #1a1a1a;">
+     <div id="loader" style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background-color: rgba(17, 24, 39, 0.9); visibility: visible;">
+       <div style="text-align: center;">
+         <div style="display: inline-block; width: 3rem; height: 3rem; border-radius: 9999px; border: 4px solid; border-color: #0284c7; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+         <p style="margin-top: 1rem; font-size: 1.125rem; font-weight: 500; color: white;">Iniciando sesión...</p>
+       </div>
+     </div>
+     <style>
+       @keyframes spin {
+         to { transform: rotate(360deg); }
+       }
+     </style>
+   </body>
+ </html>`,
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/html',
+            'Set-Cookie': `session=${encodeURIComponent(sessionData)}; ${cookieOptions}`
+          }
+        }
+      );
+    } else {
+      error = result.error;
+    }
+  }
+} catch (err) {
+  console.error("Error en el inicio de sesión:", err);
+  error = "Error al procesar la solicitud. Por favor, inténtelo de nuevo.";
+}
 }
 ---
+
+<!-- Resto del código igual -->
 
 <Layout title="Acceso Clientes">
   <!-- Incluir el TransitionLoader aquí para asegurarnos de que esté disponible -->

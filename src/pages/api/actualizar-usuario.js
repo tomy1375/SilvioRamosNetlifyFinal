@@ -8,18 +8,19 @@ export async function POST({ request }) {
     console.log("Datos recibidos:", data)
 
     const { id, nombre, email, tipo, empresa, telefono, password } = data
+    const userId = Number.parseInt(id, 10) // Convertir a número entero
 
     // Validar que se recibieron todos los datos necesarios
-    if (!id || !nombre || !email || !tipo) {
-      console.error("Faltan datos requeridos")
-      return new Response(JSON.stringify({ error: "Faltan datos requeridos" }), {
+    if (!id || isNaN(userId) || !nombre || !email || !tipo) {
+      console.error("Faltan datos requeridos o ID inválido")
+      return new Response(JSON.stringify({ error: "Faltan datos requeridos o ID inválido" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       })
     }
 
     // Verificar que el usuario existe
-    const usuarioExistente = await getUserById(id)
+    const usuarioExistente = await getUserById(userId)
     if (!usuarioExistente) {
       console.error("Usuario no encontrado")
       return new Response(JSON.stringify({ error: "Usuario no encontrado" }), {
@@ -43,7 +44,7 @@ export async function POST({ request }) {
     }
 
     // Actualizar el usuario en la base de datos
-    const usuarioActualizado = await updateUser(id, userData)
+    const usuarioActualizado = await updateUser(userId, userData)
 
     console.log("Usuario actualizado correctamente:", usuarioActualizado)
 

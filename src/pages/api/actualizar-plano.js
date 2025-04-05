@@ -8,18 +8,20 @@ export async function POST({ request }) {
     console.log("Datos recibidos:", data)
 
     const { id, nombre, tipo, usuario_id, descripcion } = data
+    const planoId = Number.parseInt(id, 10) // Convertir a número entero
+    const userId = Number.parseInt(usuario_id, 10) // Convertir a número entero
 
     // Validar que se recibieron todos los datos necesarios
-    if (!id || !nombre || !tipo || !usuario_id) {
-      console.error("Faltan datos requeridos")
-      return new Response(JSON.stringify({ error: "Faltan datos requeridos" }), {
+    if (!id || isNaN(planoId) || !nombre || !tipo || !usuario_id || isNaN(userId)) {
+      console.error("Faltan datos requeridos o IDs inválidos")
+      return new Response(JSON.stringify({ error: "Faltan datos requeridos o IDs inválidos" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       })
     }
 
     // Verificar que el plano existe
-    const planoExistente = await getPlanoById(id)
+    const planoExistente = await getPlanoById(planoId)
     if (!planoExistente) {
       console.error("Plano no encontrado")
       return new Response(JSON.stringify({ error: "Plano no encontrado" }), {
@@ -29,7 +31,7 @@ export async function POST({ request }) {
     }
 
     // Actualizar el plano en la base de datos
-    const planoActualizado = await updatePlano(id, {
+    const planoActualizado = await updatePlano(planoId, {
       nombre,
       tipo,
       descripcion: descripcion || "",

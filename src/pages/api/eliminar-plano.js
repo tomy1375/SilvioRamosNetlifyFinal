@@ -18,17 +18,18 @@ export async function POST({ request }) {
     console.log("Datos recibidos:", data)
 
     const { id } = data
+    const planoId = Number.parseInt(id, 10) // Convertir a número entero
 
-    if (!id) {
-      console.error("ID de plano no proporcionado")
-      return new Response(JSON.stringify({ error: "ID de plano no proporcionado" }), {
+    if (!id || isNaN(planoId)) {
+      console.error("ID de plano no proporcionado o inválido")
+      return new Response(JSON.stringify({ error: "ID de plano no proporcionado o inválido" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       })
     }
 
     // Obtener información del plano antes de eliminarlo
-    const plano = await getPlanoById(id)
+    const plano = await getPlanoById(planoId)
     if (!plano) {
       console.error("Plano no encontrado")
       return new Response(JSON.stringify({ error: "Plano no encontrado" }), {
@@ -56,7 +57,7 @@ export async function POST({ request }) {
     }
 
     // Eliminar el registro de la base de datos
-    await deletePlano(id)
+    await deletePlano(planoId)
     console.log("Plano eliminado de la base de datos")
 
     return new Response(JSON.stringify({ success: true, message: "Plano eliminado correctamente" }), {
