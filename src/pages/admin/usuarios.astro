@@ -50,28 +50,29 @@ try {
           <p class="text-muted-foreground">No hay usuarios disponibles. Cree su primer usuario.</p>
         </div>
       ) : (
-        <div class="relative w-full overflow-auto">
+      <div class="relative w-full overflow-auto">
+        <div class="overflow-x-auto -mx-4 sm:mx-0">
           <table class="w-full caption-bottom text-sm">
             <thead class="[&_tr]:border-b">
               <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">ID</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden sm:table-cell">ID</th>
                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Empresa</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden sm:table-cell">Email</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Tipo</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden lg:table-cell">Empresa</th>
                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
               </tr>
             </thead>
             <tbody id="usuariosTableBody" class="[&_tr:last-child]:border-0">
               {usuarios.map((usuario) => (
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted usuario-row" data-id={usuario.id.toString()}>
-                  <td class="p-4 align-middle">{usuario.id}</td>
+                  <td class="p-4 align-middle hidden sm:table-cell">{usuario.id}</td>
                   <td class="p-4 align-middle">{usuario.nombre}</td>
-                  <td class="p-4 align-middle">{usuario.email}</td>
-                  <td class="p-4 align-middle">{usuario.tipo}</td>
-                  <td class="p-4 align-middle">{usuario.empresa || '-'}</td>
+                  <td class="p-4 align-middle hidden sm:table-cell">{usuario.email}</td>
+                  <td class="p-4 align-middle hidden md:table-cell">{usuario.tipo}</td>
+                  <td class="p-4 align-middle hidden lg:table-cell">{usuario.empresa || '-'}</td>
                   <td class="p-4 align-middle">
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                       <a 
                         href={`/admin/editar-usuario/${usuario.id}`}
                         class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
@@ -93,34 +94,47 @@ try {
             </tbody>
           </table>
         </div>
-      )}
-    </div>
+      </div>
+    )}
   </div>
 </div>
 </AdminLayout>
 
+<!-- Incluir SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-  import Swal from "sweetalert2";
+import Swal from "sweetalert2";
 
-  // Cargar estilos de SweetAlert2 inmediatamente
-  (function() {
-    if (!document.querySelector('link[href*="sweetalert2.min.css"]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css';
-      document.head.appendChild(link);
-      console.log("Estilos de SweetAlert2 cargados inmediatamente.");
-    }
-  })();
-
-  // Definir interfaces para TypeScript
-  interface DeleteButton extends HTMLButtonElement {
-    getAttribute(name: string): string | null;
-    closest<E extends Element = Element>(selector: string): E | null;
-  }
-
+document.addEventListener('DOMContentLoaded', function() {
+  // Configurar eventos para los botones de eliminar
+  document.querySelectorAll('.eliminar-usuario').forEach(function(boton) {
+    boton.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      const nombre = this.getAttribute('data-nombre');
+      const fila = this.closest('tr');
+      
+      // Usar SweetAlert2 para la confirmación
+      Swal.fire({
+        title: '¿Está seguro?',
+        text: `¿Desea eliminar el usuario "${nombre}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          eliminarUsuario(id, fila);
+        }
+      });
+    });
+  });
+  
   // Función para eliminar un usuario
-  function eliminarUsuario(id: string, fila: HTMLTableRowElement | null): void {
+  function eliminarUsuario(id, fila) {
+    // Mostrar indicador de carga
     Swal.fire({
       title: 'Eliminando...',
       text: 'Por favor espere',
@@ -140,11 +154,28 @@ try {
     .then(function(response) {
       return response.json();
     })
-    .then(function(data: { success: boolean, error?: string }) {
+    .then(function(data) {
       if (data.success) {
+        // Eliminar la fila de la tabla sin recargar la página
         if (fila) {
           fila.remove();
         }
+        
+        // Verificar si la tabla está vacía
+        const tbody = document.getElementById('usuariosTableBody');
+        if (tbody && tbody.children.length === 0) {
+          // Si no hay más usuarios, mostrar mensaje
+          const container = tbody.closest('.relative');
+          if (container) {
+            container.innerHTML = `
+              <div class="text-center py-8">
+                <p class="text-muted-foreground">No hay usuarios disponibles. Cree su primer usuario.</p>
+              </div>
+            `;
+          }
+        }
+        
+        // Mostrar mensaje de éxito
         Swal.fire({
           title: '¡Eliminado!',
           text: 'El usuario ha sido eliminado correctamente.',
@@ -170,61 +201,6 @@ try {
       });
     });
   }
-
-  // Función para configurar botones de eliminar
-  function setupDeleteButtons(): void {
-    console.log("Configurando botones de eliminar para usuarios...");
-    
-    const deleteButtons = document.querySelectorAll<DeleteButton>('.eliminar-usuario');
-    
-    deleteButtons.forEach(function(boton) {
-      const id = boton.getAttribute('data-id');
-      const nombre = boton.getAttribute('data-nombre');
-
-      if (!id || !nombre) {
-        console.error('Faltan atributos de datos en el botón');
-        return;
-      }
-
-      boton.addEventListener('click', function() {
-        Swal.fire({
-          title: '¿Está seguro?',
-          text: `¿Desea eliminar el usuario "${nombre}"?`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Sí, eliminar',
-          cancelButtonText: 'Cancelar'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            const fila = this.closest('tr');
-            eliminarUsuario(id, fila);
-          }
-        });
-      });
-    });
-  }
-
-  // Función para inicializar todo
-  function initializePage(): void {
-    console.log("Inicializando página de usuarios...");
-    setupDeleteButtons();
-  }
-
-  // Ejecutar en DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOMContentLoaded disparado");
-    initializePage();
-  });
-
-  // Ejecutar también en el evento astro:page-load para View Transitions
-  document.addEventListener('astro:page-load', function() {
-    console.log("astro:page-load disparado");
-    initializePage();
-  });
-
-  // Ejecutar inmediatamente
-  console.log("Ejecutando inicialización inmediata");
-  initializePage();
+});
 </script>
+

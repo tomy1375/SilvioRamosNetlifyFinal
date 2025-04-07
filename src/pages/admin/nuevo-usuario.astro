@@ -93,7 +93,7 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
           </div>
         </div>
         
-        <div class="flex justify-end gap-4">
+        <div class="flex flex-col sm:flex-row justify-end gap-4">
           <a 
             href="/admin/usuarios" 
             class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
@@ -114,13 +114,18 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 </div>
 </AdminLayout>
 
-<script is:inline>
+<!-- Incluir SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+import Swal from "sweetalert2";
+
   // Función para crear un nuevo usuario
   function crearNuevoUsuario() {
     console.log('Creando nuevo usuario...');
     
     // Obtener el formulario
-    const form = document.getElementById('nuevoUsuarioForm');
+    const form = document.getElementById('nuevoUsuarioForm') as HTMLFormElement;
     
     if (form) {
       // Obtener los datos del formulario
@@ -136,7 +141,12 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       
       // Validar que las contraseñas coincidan
       if (password !== confirmPassword) {
-        alert('Las contraseñas no coinciden');
+        Swal.fire({
+          title: 'Error',
+          text: 'Las contraseñas no coinciden',
+          icon: 'error',
+          confirmButtonColor: '#3085d6'
+        });
         return;
       }
       
@@ -149,6 +159,16 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
         empresa: empresa || null,
         password,
       };
+      
+      // Mostrar indicador de carga
+      Swal.fire({
+        title: 'Creando usuario...',
+        text: 'Por favor espere',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
       
       // Mostrar los datos que se van a enviar (para depuración)
       console.log('Enviando datos:', { ...userData, password: '******' });
@@ -168,18 +188,40 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
       .then(data => {
         console.log('Datos recibidos:', data);
         if (data.success) {
-          alert('Usuario creado correctamente');
-          window.location.href = '/admin/usuarios';
+          Swal.fire({
+            title: '¡Usuario creado!',
+            text: 'El usuario ha sido creado correctamente',
+            icon: 'success',
+            confirmButtonColor: '#3085d6'
+          }).then(() => {
+            window.location.href = '/admin/usuarios';
+          });
         } else {
-          alert(`Error: ${data.error || 'No se pudo crear el usuario'}`);
+          Swal.fire({
+            title: 'Error',
+            text: data.error || 'No se pudo crear el usuario',
+            icon: 'error',
+            confirmButtonColor: '#3085d6'
+          });
         }
       })
       .catch(error => {
         console.error('Error al crear el usuario:', error);
-        alert('Error al crear el usuario. Por favor, inténtelo de nuevo.');
+        Swal.fire({
+          title: 'Error',
+          text: 'Error al crear el usuario. Por favor, inténtelo de nuevo.',
+          icon: 'error',
+          confirmButtonColor: '#3085d6'
+        });
       });
     } else {
       console.error('Formulario no encontrado');
+      Swal.fire({
+        title: 'Error',
+        text: 'Formulario no encontrado',
+        icon: 'error',
+        confirmButtonColor: '#3085d6'
+      });
     }
   }
   

@@ -1,7 +1,6 @@
-@tailwindcss base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 :root {
   --background: 0 0% 100%;
@@ -56,3 +55,48 @@ body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
 }
+
+/* Mejoras para dispositivos móviles */
+/* Make tables responsive */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure buttons stack properly on mobile */
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* Responsive padding for mobile */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1rem;
+  }
+
+  .p-4 {
+    padding: 0.75rem;
+  }
+
+  /* Ajustar el tamaño del texto en tablas para móviles */
+  table {
+    font-size: 0.75rem;
+  }
+
+  /* Mejorar espaciado en formularios */
+  .space-y-6 {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Asegurar que las transiciones de página no muestren fondo blanco */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+.dark::view-transition-old(root),
+.dark::view-transition-new(root) {
+  background-color: #1a1a1a;
+}
+

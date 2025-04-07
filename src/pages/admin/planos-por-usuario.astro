@@ -68,7 +68,7 @@ if (usuarioId) {
       <form id="seleccionarUsuarioForm" class="space-y-4">
         <div class="space-y-2">
           <label for="usuario" class="text-sm font-medium leading-none">Seleccionar Usuario</label>
-          <div class="flex gap-4">
+          <div class="flex flex-col sm:flex-row gap-4">
             <select 
               id="usuario" 
               name="usuario" 
@@ -109,50 +109,52 @@ if (usuarioId) {
             <p class="text-muted-foreground">Este usuario no tiene planos asignados.</p>
           ) : (
             <div class="relative w-full overflow-auto">
-              <table class="w-full caption-bottom text-sm">
-                <thead class="[&_tr]:border-b">
-                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
-                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
-                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fecha</th>
-                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody class="[&_tr:last-child]:border-0">
-                  {planosUsuario.map((plano) => (
-                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted" data-id={plano.id}>
-                      <td class="p-4 align-middle">{plano.nombre}</td>
-                      <td class="p-4 align-middle">{plano.tipo}</td>
-                      <td class="p-4 align-middle">{new Date(plano.fecha_subida).toLocaleDateString()}</td>
-                      <td class="p-4 align-middle">
-                        <div class="flex gap-2">
-                          <a 
-                            href={plano.archivo_url} 
-                            target="_blank" 
-                            class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                          >
-                            Ver
-                          </a>
-                          <a 
-                            href={`/admin/editar-plano/${plano.id}`}
-                            class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                          >
-                            Editar
-                          </a>
-                          <button 
-                            type="button"
-                            class="eliminar-plano inline-flex h-9 items-center justify-center rounded-md bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground shadow-sm hover:bg-destructive/90"
-                            data-id={plano.id.toString()}
-                            data-nombre={plano.nombre}
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
+              <div class="overflow-x-auto -mx-4 sm:mx-0">
+                <table class="w-full caption-bottom text-sm">
+                  <thead class="[&_tr]:border-b">
+                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                      <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
+                      <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Tipo</th>
+                      <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden lg:table-cell">Fecha</th>
+                      <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody class="[&_tr:last-child]:border-0">
+                    {planosUsuario.map((plano) => (
+                      <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted" data-id={plano.id}>
+                        <td class="p-4 align-middle">{plano.nombre}</td>
+                        <td class="p-4 align-middle hidden md:table-cell">{plano.tipo}</td>
+                        <td class="p-4 align-middle hidden lg:table-cell">{new Date(plano.fecha_subida).toLocaleDateString()}</td>
+                        <td class="p-4 align-middle">
+                          <div class="flex flex-wrap gap-2">
+                            <a 
+                              href={plano.archivo_url} 
+                              target="_blank" 
+                              class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                            >
+                              Ver
+                            </a>
+                            <a 
+                              href={`/admin/editar-plano/${plano.id}`}
+                              class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                            >
+                              Editar
+                            </a>
+                            <button 
+                              type="button"
+                              class="eliminar-plano inline-flex h-9 items-center justify-center rounded-md bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground shadow-sm hover:bg-destructive/90"
+                              data-id={plano.id.toString()}
+                              data-nombre={plano.nombre}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
