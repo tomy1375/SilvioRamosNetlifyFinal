@@ -150,11 +150,23 @@ export async function getHistorialByUserId(userId) {
 }
 
 export async function createHistorial(historialData) {
-  console.log(`Creando registro de historial: usuario=${historialData.usuario_id}, plano=${historialData.plano_id}, fecha=${historialData.fecha}, hora=${historialData.hora}`)
+  console.log(`Creando registro de historial: usuario=${historialData.usuario_id}, plano=${historialData.plano_id}, fecha=${historialData.fecha}`)
 
   try {
+    // Asegurarnos de que fecha y hora sean objetos Date válidos
+    const fechaObj = historialData.fecha instanceof Date ? 
+      historialData.fecha : new Date(historialData.fecha);
+    
+    const horaObj = historialData.hora instanceof Date ? 
+      historialData.hora : new Date(historialData.hora);
+    
     const result = await prisma.historial.create({
-      data: historialData
+      data: {
+        usuario_id: historialData.usuario_id,
+        plano_id: historialData.plano_id,
+        fecha: fechaObj,
+        hora: horaObj
+      }
     })
     console.log("Historial creado:", result)
     return result
@@ -163,7 +175,6 @@ export async function createHistorial(historialData) {
     throw error
   }
 }
-
 // Mantener la función query para compatibilidad con código existente
 export async function query(text, params) {
   console.warn("La función query está obsoleta. Por favor, usa las funciones específicas de Prisma.")
