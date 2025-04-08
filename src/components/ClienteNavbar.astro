@@ -21,8 +21,17 @@ const { activeLink } = Astro.props;
      <a href="/cliente" class="font-bold text-xl">Gestión de Planos</a>
    </div>
    
-   <nav class="flex items-center gap-6">
-     <div class="hidden md:flex gap-6">
+   <!-- Mobile menu button -->
+   <button id="mobileMenuBtn" class="md:hidden flex items-center p-2" aria-label="Menu de navegación">
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+       <line x1="4" x2="20" y1="12" y2="12"></line>
+       <line x1="4" x2="20" y1="6" y2="6"></line>
+       <line x1="4" x2="20" y1="18" y2="18"></line>
+     </svg>
+   </button>
+   
+   <nav class="hidden md:flex items-center gap-6">
+     <div class="flex gap-6">
        {links.map(link => (
          <a 
            href={link.href} 
@@ -63,6 +72,48 @@ const { activeLink } = Astro.props;
      )}
    </nav>
  </div>
+ 
+ <!-- Mobile navigation drawer -->
+ <div id="mobileMenu" class="fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out translate-x-full md:hidden">
+   <div class="absolute inset-0 bg-black bg-opacity-50" id="mobileMenuOverlay"></div>
+   <div class="absolute right-0 h-full w-3/4 max-w-sm bg-background shadow-xl flex flex-col">
+     <div class="flex items-center justify-between p-4 border-b">
+       <h2 class="font-bold text-lg">Menú</h2>
+       <button id="closeMobileMenuBtn" class="p-2" aria-label="Cerrar menú">
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+           <path d="M18 6 6 18"></path>
+           <path d="m6 6 12 12"></path>
+         </svg>
+       </button>
+     </div>
+     
+     <div class="flex flex-col p-4 space-y-4">
+       {links.map(link => (
+         <a 
+           href={link.href} 
+           class={`text-sm font-medium transition-colors hover:text-primary ${activeLink === link.active ? 'text-primary' : 'text-muted-foreground'}`}
+         >
+           {link.text}
+         </a>
+       ))}
+     </div>
+     
+     {usuario && (
+       <div class="mt-auto border-t p-4">
+         <div class="flex items-center justify-between mb-4">
+           <div>
+             <div class="font-medium">{usuario.nombre}</div>
+             <div class="text-xs text-gray-500 dark:text-gray-400">{usuario.email}</div>
+           </div>
+           <ThemeToggle client:load />
+         </div>
+         <button id="mobileLogoutBtn" class="w-full py-2 px-4 bg-gray-100 dark:bg-gray-700 rounded-md text-sm font-medium">
+           Cerrar sesión
+         </button>
+       </div>
+     )}
+   </div>
+ </div>
 </header>
 
 <script is:inline>
@@ -70,6 +121,49 @@ const { activeLink } = Astro.props;
  const userMenuBtn = document.getElementById('userMenuBtn');
  const userMenu = document.getElementById('userMenu');
  const logoutBtn = document.getElementById('logoutBtn');
+ const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+ const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+ const closeMobileMenuBtn = document.getElementById('closeMobileMenuBtn');
+ const mobileMenu = document.getElementById('mobileMenu');
+ const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+ 
+ // Función para cerrar sesión
+ function logout() {
+   // Establecer la acción para el TransitionLoader
+   sessionStorage.setItem('navigationAction', 'logout');
+   sessionStorage.setItem('navigationTarget', '/login');
+   
+   // Mostrar manualmente el loader con mensaje personalizado
+   const event = new CustomEvent('showLoader', { 
+     detail: { message: 'Cerrando sesión...' } 
+   });
+   document.dispatchEvent(event);
+   
+   // Eliminar la cookie de sesión
+   document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+   
+   // Pequeño retraso para asegurar que el loader se muestre
+   setTimeout(() => {
+     // Redirigir a la página de inicio de sesión
+     window.location.href = "/login";
+   }, 300);
+ }
+ 
+ // Función para abrir el menú móvil
+ function openMobileMenu() {
+   if (mobileMenu) {
+     mobileMenu.classList.remove('translate-x-full');
+     document.body.classList.add('overflow-hidden');
+   }
+ }
+ 
+ // Función para cerrar el menú móvil
+ function closeMobileMenu() {
+   if (mobileMenu) {
+     mobileMenu.classList.add('translate-x-full');
+     document.body.classList.remove('overflow-hidden');
+   }
+ }
  
  if (userMenuBtn && userMenu) {
    userMenuBtn.addEventListener('click', () => {
@@ -90,26 +184,37 @@ const { activeLink } = Astro.props;
  if (logoutBtn) {
    logoutBtn.addEventListener('click', (e) => {
      e.preventDefault();
-     
-     // Establecer la acción para el TransitionLoader
-     sessionStorage.setItem('navigationAction', 'logout');
-     sessionStorage.setItem('navigationTarget', '/login');
-     
-     // Mostrar manualmente el loader con mensaje personalizado
-     const event = new CustomEvent('showLoader', { 
-       detail: { message: 'Cerrando sesión...' } 
-     });
-     document.dispatchEvent(event);
-     
-     // Eliminar la cookie de sesión
-     document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-     
-     // Pequeño retraso para asegurar que el loader se muestre
-     setTimeout(() => {
-       // Redirigir a la página de inicio de sesión
-       window.location.href = "/login";
-     }, 300);
+     logout();
    });
  }
+ 
+ // Manejar el cierre de sesión en móvil
+ if (mobileLogoutBtn) {
+   mobileLogoutBtn.addEventListener('click', (e) => {
+     e.preventDefault();
+     logout();
+   });
+ }
+ 
+ // Manejar la apertura del menú móvil
+ if (mobileMenuBtn) {
+   mobileMenuBtn.addEventListener('click', openMobileMenu);
+ }
+ 
+ // Manejar el cierre del menú móvil
+ if (closeMobileMenuBtn) {
+   closeMobileMenuBtn.addEventListener('click', closeMobileMenu);
+ }
+ 
+ // Cerrar el menú móvil al hacer clic en el overlay
+ if (mobileMenuOverlay) {
+   mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+ }
+ 
+ // Cerrar el menú móvil al redimensionar la ventana a un tamaño de escritorio
+ window.addEventListener('resize', () => {
+   if (window.innerWidth >= 768) { // 768px es el breakpoint 'md' en Tailwind
+     closeMobileMenu();
+   }
+ });
 </script>
-

@@ -60,45 +60,80 @@ try {
           <p class="text-muted-foreground">Aún no ha descargado ningún plano. Visite la sección "Mis Planos" para ver los planos disponibles.</p>
         </div>
       ) : (
-        <div class="relative w-full overflow-auto">
-          <table class="w-full caption-bottom text-sm">
-            <thead class="[&_tr]:border-b">
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fecha</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Hora</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre del Plano</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acción</th>
-              </tr>
-            </thead>
-            <tbody class="[&_tr:last-child]:border-0">
-              {historial.map((item) => (
+        <>
+          {/* Vista de tabla para pantallas medianas y grandes */}
+          <div class="hidden md:block relative w-full overflow-auto">
+            <table class="w-full caption-bottom text-sm">
+              <thead class="[&_tr]:border-b">
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <td class="p-4 align-middle">{new Date(item.fecha).toLocaleDateString('es-AR')}</td>
-                  <td class="p-4 align-middle">{new Date(item.hora).toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'})}</td>
-                  <td class="p-4 align-middle">{item.nombre}</td>
-                  <td class="p-4 align-middle">{item.tipo}</td>
-                  <td class="p-4 align-middle">
-                    <a 
-                      href={item.archivo_url}
-                      target="_blank"
-                      class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 download-btn"
-                      data-plano-id={item.plano_id}
-                      data-usuario-id={usuario.id}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                      Descargar de nuevo
-                    </a>
-                  </td>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fecha</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Hora</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre del Plano</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
+                  <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acción</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody class="[&_tr:last-child]:border-0">
+                {historial.map((item) => (
+                  <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                    <td class="p-4 align-middle">{new Date(item.fecha).toLocaleDateString('es-AR')}</td>
+                    <td class="p-4 align-middle">{new Date(item.hora).toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'})}</td>
+                    <td class="p-4 align-middle">{item.nombre}</td>
+                    <td class="p-4 align-middle">{item.tipo}</td>
+                    <td class="p-4 align-middle">
+                      <a 
+                        href={item.archivo_url}
+                        target="_blank"
+                        class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 download-btn"
+                        data-plano-id={item.plano_id}
+                        data-usuario-id={usuario.id}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="7 10 12 15 17 10"></polyline>
+                          <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Descargar de nuevo
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Vista simplificada para móviles - solo fecha, nombre del plano y acción */}
+          <div class="md:hidden space-y-4">
+            {historial.map((item) => (
+              <div class="border-b pb-4">
+                <div class="flex items-center text-sm text-muted-foreground mb-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 h-4 w-4">
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                    <line x1="16" x2="16" y1="2" y2="6"></line>
+                    <line x1="8" x2="8" y1="2" y2="6"></line>
+                    <line x1="3" x2="21" y1="10" y2="10"></line>
+                  </svg>
+                  {new Date(item.fecha).toLocaleDateString('es-AR')} - {new Date(item.hora).toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'})}
+                </div>
+                <div class="font-medium mb-3">{item.nombre}</div>
+                <a 
+                  href={item.archivo_url}
+                  target="_blank"
+                  class="inline-flex h-10 w-full items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 download-btn"
+                  data-plano-id={item.plano_id}
+                  data-usuario-id={usuario.id}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 h-4 w-4">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Descargar de nuevo
+                </a>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   </div>
@@ -172,4 +207,3 @@ try {
     }
   });
 </script>
-
