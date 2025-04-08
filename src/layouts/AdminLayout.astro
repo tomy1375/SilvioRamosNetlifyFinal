@@ -44,6 +44,16 @@ const { title, activeLink } = Astro.props;
       html.dark::view-transition-new(root) {
         background-color: #1a1a1a !important;
       }
+
+      /* Estilos para la transición del sidebar */
+      #sidebar {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      html.dark #sidebar {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      }
     </style>
     
     <!-- Script para prevenir el parpadeo blanco en modo oscuro -->
@@ -130,7 +140,7 @@ const { title, activeLink } = Astro.props;
       </div>
     </header>
     <div class="flex flex-1">
-      <aside id="sidebar" class="w-64 border-r bg-muted/40 hidden md:block fixed md:static h-[calc(100vh-4rem)] md:h-auto z-40 overflow-y-auto">
+      <aside id="sidebar" class="w-64 border-r bg-muted/90 hidden md:block fixed md:static h-[calc(100vh-4rem)] md:h-auto z-40 overflow-y-auto transition-all duration-300 ease-in-out transform">
         <div class="flex flex-col gap-2 p-4">
           <AdminNavLink href="/admin" isActive={activeLink === 'usuarios'} client:load>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
@@ -167,7 +177,7 @@ const { title, activeLink } = Astro.props;
           </AdminNavLink>
           <AdminNavLink href="/admin/configuracion" isActive={activeLink === 'configuracion'} client:load>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
-              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
             <span>Configuración</span>
@@ -226,7 +236,21 @@ const { title, activeLink } = Astro.props;
         
         if (mobileMenuToggle && sidebar) {
           mobileMenuToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('hidden');
+            if (sidebar.classList.contains('hidden')) {
+              sidebar.classList.remove('hidden');
+              // Pequeño retraso para permitir que la transición funcione
+              setTimeout(() => {
+                sidebar.classList.add('translate-x-0');
+                sidebar.classList.remove('-translate-x-full');
+              }, 10);
+            } else {
+              sidebar.classList.add('-translate-x-full');
+              sidebar.classList.remove('translate-x-0');
+              // Esperar a que termine la transición antes de ocultar
+              setTimeout(() => {
+                sidebar.classList.add('hidden');
+              }, 300);
+            }
           });
           
           // Close sidebar when clicking outside
@@ -235,7 +259,12 @@ const { title, activeLink } = Astro.props;
             const isClickOnToggle = mobileMenuToggle.contains(event.target);
             
             if (!isClickInsideSidebar && !isClickOnToggle && !sidebar.classList.contains('hidden') && window.innerWidth < 768) {
-              sidebar.classList.add('hidden');
+              sidebar.classList.add('-translate-x-full');
+              sidebar.classList.remove('translate-x-0');
+              // Esperar a que termine la transición antes de ocultar
+              setTimeout(() => {
+                sidebar.classList.add('hidden');
+              }, 300);
             }
           });
           
@@ -243,10 +272,21 @@ const { title, activeLink } = Astro.props;
           window.addEventListener('resize', function() {
             if (window.innerWidth >= 768) {
               sidebar.classList.remove('hidden');
-            } else {
+              sidebar.classList.remove('-translate-x-full');
+              sidebar.classList.add('translate-x-0');
+            } else if (!sidebar.classList.contains('-translate-x-full')) {
               sidebar.classList.add('hidden');
+              sidebar.classList.add('-translate-x-full');
+              sidebar.classList.remove('translate-x-0');
             }
           });
+          
+          // Inicializar el estado del sidebar
+          if (window.innerWidth < 768) {
+            sidebar.classList.add('-translate-x-full');
+          } else {
+            sidebar.classList.add('translate-x-0');
+          }
         }
       });
     </script>

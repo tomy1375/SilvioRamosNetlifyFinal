@@ -57,102 +57,42 @@ try {
   </div>
 
   <!-- Tarjetas de estadísticas -->
-  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+  <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
       <div class="flex flex-col space-y-1.5">
         <h3 class="text-sm font-medium text-muted-foreground">Total de Planos</h3>
-        <div class="text-2xl font-bold">{totalPlanos}</div>
+        <div class="text-xl md:text-2xl font-bold">{totalPlanos}</div>
       </div>
     </div>
     
-    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
       <div class="flex flex-col space-y-1.5">
         <h3 class="text-sm font-medium text-muted-foreground">Total de Usuarios</h3>
-        <div class="text-2xl font-bold">{totalUsuarios}</div>
+        <div class="text-xl md:text-2xl font-bold">{totalUsuarios}</div>
       </div>
     </div>
     
-    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
       <div class="flex flex-col space-y-1.5">
         <h3 class="text-sm font-medium text-muted-foreground">Descargas Hoy</h3>
-        <div class="text-2xl font-bold">0</div>
+        <div class="text-xl md:text-2xl font-bold">0</div>
       </div>
     </div>
     
-    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+    <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-4 md:p-6">
       <div class="flex flex-col space-y-1.5">
         <h3 class="text-sm font-medium text-muted-foreground">Planos Esta Semana</h3>
-        <div class="text-2xl font-bold">0</div>
+        <div class="text-xl md:text-2xl font-bold">0</div>
       </div>
-    </div>
-  </div>
-
-  <!-- Últimos planos -->
-  <div class="rounded-lg border shadow-sm">
-    <div class="p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Últimos Planos Subidos</h2>
-        <a 
-          href="/admin/planos" 
-          class="text-sm text-primary hover:underline"
-        >
-          Ver todos los planos
-        </a>
-      </div>
-      
-      {ultimosPlanos.length === 0 ? (
-        <p class="text-muted-foreground">No hay planos disponibles.</p>
-      ) : (
-        <div class="relative w-full overflow-auto">
-          <table class="w-full caption-bottom text-sm">
-            <thead class="[&_tr]:border-b">
-              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cliente</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Tipo</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Fecha</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="[&_tr:last-child]:border-0">
-              {ultimosPlanos.map((plano) => (
-                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                  <td class="p-4 align-middle">{plano.nombre}</td>
-                  <td class="p-4 align-middle">{plano.cliente_nombre || `ID: ${plano.usuario_id}`}</td>
-                  <td class="p-4 align-middle">{plano.tipo}</td>
-                  <td class="p-4 align-middle">{new Date(plano.fecha_subida).toLocaleDateString()}</td>
-                  <td class="p-4 align-middle">
-                    <div class="flex gap-2">
-                      <a 
-                        href={plano.archivo_url} 
-                        target="_blank" 
-                        class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                      >
-                        Ver
-                      </a>
-                      <a 
-                        href={`/admin/editar-plano/${plano.id}`}
-                        class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-                      >
-                        Editar
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   </div>
 
   <!-- Clientes -->
   <div class="rounded-lg border shadow-sm">
-    <div class="p-6">
-      <div class="flex items-center justify-between mb-4">
+    <div class="p-4 md:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
         <h2 class="text-xl font-semibold">Clientes</h2>
-        <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row gap-2">
           <a 
             href="/admin/usuarios" 
             class="text-sm text-primary hover:underline"
@@ -181,20 +121,20 @@ try {
           <table class="w-full caption-bottom text-sm">
             <thead class="[&_tr]:border-b">
               <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">ID</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">ID</th>
                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
-                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Empresa</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Email</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Empresa</th>
                 <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
               </tr>
             </thead>
             <tbody id="clientesTableBody" class="[&_tr:last-child]:border-0">
               {clientes.map((cliente) => (
                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cliente-row" data-id={cliente.id.toString()}>
-                  <td class="p-4 align-middle">{cliente.id}</td>
-                  <td class="p-4 align-middle">{cliente.nombre}</td>
-                  <td class="p-4 align-middle">{cliente.email}</td>
-                  <td class="p-4 align-middle">{cliente.empresa || '-'}</td>
+                  <td class="p-4 align-middle hidden md:table-cell">{cliente.id}</td>
+                  <td class="p-4 align-middle truncate max-w-[180px] sm:max-w-none">{cliente.nombre}</td>
+                  <td class="p-4 align-middle hidden md:table-cell">{cliente.email}</td>
+                  <td class="p-4 align-middle truncate max-w-[100px] sm:max-w-none hidden md:table-cell">{cliente.empresa || '-'}</td>
                   <td class="p-4 align-middle">
                     <div class="flex gap-2">
                       <a 
@@ -211,6 +151,66 @@ try {
                       >
                         Eliminar
                       </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <!-- Últimos planos -->
+  <div class="rounded-lg border shadow-sm">
+    <div class="p-4 md:p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+        <h2 class="text-xl font-semibold">Últimos Planos Subidos</h2>
+        <a 
+          href="/admin/planos" 
+          class="text-sm text-primary hover:underline"
+        >
+          Ver todos los planos
+        </a>
+      </div>
+      
+      {ultimosPlanos.length === 0 ? (
+        <p class="text-muted-foreground">No hay planos disponibles.</p>
+      ) : (
+        <div class="relative w-full overflow-auto">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&_tr]:border-b">
+              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nombre</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Cliente</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Tipo</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground hidden md:table-cell">Fecha</th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="[&_tr:last-child]:border-0">
+              {ultimosPlanos.map((plano) => (
+                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                  <td class="p-4 align-middle truncate max-w-[120px] sm:max-w-none">{plano.nombre}</td>
+                  <td class="p-4 align-middle truncate max-w-[100px] sm:max-w-none">{plano.cliente_nombre || `ID: ${plano.usuario_id}`}</td>
+                  <td class="p-4 align-middle hidden md:table-cell">{plano.tipo}</td>
+                  <td class="p-4 align-middle hidden md:table-cell">{new Date(plano.fecha_subida).toLocaleDateString()}</td>
+                  <td class="p-4 align-middle">
+                    <div class="flex gap-2">
+                      <a 
+                        href={plano.archivo_url} 
+                        target="_blank" 
+                        class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        Ver
+                      </a>
+                      <a 
+                        href={`/admin/editar-plano/${plano.id}`}
+                        class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                      >
+                        Editar
+                      </a>
                     </div>
                   </td>
                 </tr>
@@ -325,4 +325,3 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-
