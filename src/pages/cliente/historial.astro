@@ -3,6 +3,39 @@ import ClienteLayout from '../../layouts/ClienteLayout.astro';
 import { getHistorialByUserId } from '../../lib/db.js';
 import { isAuthenticated } from '../../lib/auth.js';
 
+// Función para formatear la hora en zona horaria de Argentina
+function formatearHoraArgentina(fechaStr: string): string {
+  // Crear un objeto Date a partir del string
+  const fecha = new Date(fechaStr);
+  
+  // Opciones para formatear la hora en zona horaria de Argentina
+  const opciones: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Argentina/Buenos_Aires'
+  };
+  
+  // Devolver la hora formateada
+  return fecha.toLocaleTimeString('es-AR', opciones);
+}
+
+// Función para formatear la fecha en zona horaria de Argentina
+function formatearFechaArgentina(fechaStr: string): string {
+  // Crear un objeto Date a partir del string
+  const fecha = new Date(fechaStr);
+  
+  // Opciones para formatear la fecha en zona horaria de Argentina
+  const opciones: Intl.DateTimeFormatOptions = {
+    timeZone: 'America/Argentina/Buenos_Aires',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  };
+  
+  // Devolver la fecha formateada
+  return fecha.toLocaleDateString('es-AR', opciones);
+}
+
 // Definir la interfaz para el historial
 interface HistorialItem {
   id: number;
@@ -76,8 +109,8 @@ try {
               <tbody class="[&_tr:last-child]:border-0">
                 {historial.map((item) => (
                   <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td class="p-4 align-middle">{new Date(item.fecha).toLocaleDateString('es-AR')}</td>
-                    <td class="p-4 align-middle">{new Date(item.hora).toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'})}</td>
+                    <td class="p-4 align-middle">{formatearFechaArgentina(item.fecha)}</td>
+                    <td class="p-4 align-middle">{formatearHoraArgentina(item.hora)}</td>
                     <td class="p-4 align-middle">{item.nombre}</td>
                     <td class="p-4 align-middle">{item.tipo}</td>
                     <td class="p-4 align-middle">
@@ -113,7 +146,7 @@ try {
                     <line x1="8" x2="8" y1="2" y2="6"></line>
                     <line x1="3" x2="21" y1="10" y2="10"></line>
                   </svg>
-                  {new Date(item.fecha).toLocaleDateString('es-AR')} - {new Date(item.hora).toLocaleTimeString('es-AR', {hour: '2-digit', minute: '2-digit'})}
+                  {formatearFechaArgentina(item.fecha)} - {formatearHoraArgentina(item.hora)}
                 </div>
                 <div class="font-medium mb-3">{item.nombre}</div>
                 <a 
