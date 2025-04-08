@@ -87,11 +87,11 @@ body {
   border: 4px solid;
   border-color: transparent;
   font-size: 16px;
-  background-color: #1e40af;
+  background-color: #245070;
   border-radius: 100px;
   font-weight: 600;
   color: #e9edf1;
-  box-shadow: 0 0 0 2px #1e40af;
+  box-shadow: 0 0 0 2px #245070;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -121,7 +121,7 @@ body {
   transform: translate(-50%, -50%);
   width: 16px;
   height: 16px;
-  background-color: #1e40af;
+  background-color: #245070;
   border-radius: 50%;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
@@ -158,7 +158,7 @@ body {
 
 .animated-button:active {
   scale: 0.95;
-  box-shadow: 0 0 0 4px #1e40af;
+  box-shadow: 0 0 0 4px #245070;
 }
 
 .animated-button:hover .circle {
