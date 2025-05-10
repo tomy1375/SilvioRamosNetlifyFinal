@@ -6,6 +6,9 @@ import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
+   devToolbar: {
+    enabled: false, // Desactiva la toolbar correctamente
+  },
   integrations: [
     tailwind({
       // Opcional: Configura la ubicación de tu archivo CSS
